@@ -5,13 +5,8 @@ import (
   "fmt"
 )
 
-// The user struct
-type user struct{
-	Username string
-}
-
 var index int = 0;
-var users [1000]user;
+var users [1000]*user;
 
 // The post method of users
 // Adds the user to the users list
@@ -24,8 +19,28 @@ func addUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil{
 		panic(err)
 	}
-  users[index] = user
+	u := NewUser(user.Username)
+
+  users[index] = u
   index++
+}
+
+func updateUser(w http.ResponseWriter, r *http.Request){
+		user := user{} //initialize empty user
+
+	//Parse json request body and use it to set fields on user
+	err := json.NewDecoder(r.Body).Decode(&user)
+	if err != nil{
+		panic(err)
+	}
+
+	u := NewUserWithId(user.Id, user.Username)
+
+	for i:=0; i < 1000; i++ {
+		if(u.Id == users[i].Id){
+			users[i] = u
+		}
+	}
 }
 
 // Users get request function
@@ -59,7 +74,7 @@ func usersRouter(w http.ResponseWriter, r *http.Request){
 
 func main() {
 	// Default user
-	users[0].Username = "sella"
+	users[0] = NewUser("sella")
 	
 	// Http server conf
   http.HandleFunc("/users", usersRouter)
