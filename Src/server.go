@@ -10,7 +10,7 @@ type user struct{
 }
 
 var index int = 0;
-var users [100]user;
+var users [1000]user;
 
 
 func addUser(w http.ResponseWriter, r *http.Request) {
@@ -29,7 +29,7 @@ func addUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func getUsers(w http.ResponseWriter, r *http.Request){
-	js, err := json.Marshal(users)
+	js, err := json.Marshal(users[0:index])
 	if err != nil {
 	  http.Error(w, err.Error(), http.StatusInternalServerError)
 	  return
