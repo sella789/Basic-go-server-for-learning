@@ -29,7 +29,7 @@ func addUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func getUsers(w http.ResponseWriter, r *http.Request){
-	js, err := json.Marshal(users[0:index])
+	js, err := json.Marshal(users[0:index+1])
 	if err != nil {
 	  http.Error(w, err.Error(), http.StatusInternalServerError)
 	  return
