@@ -5,6 +5,7 @@ import (
   "fmt"
 )
 
+// The user struct
 type user struct{
 	Username string
 }
@@ -12,7 +13,8 @@ type user struct{
 var index int = 0;
 var users [1000]user;
 
-
+// The post method of users
+// Adds the user to the users list
 func addUser(w http.ResponseWriter, r *http.Request) {
 	user := user{} //initialize empty user
 
@@ -22,12 +24,12 @@ func addUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil{
 		panic(err)
 	}
-  //message = "Hello " + message
   users[index] = user
   index++
-  //w.Write([]byte(message))
 }
 
+// Users get request function
+// Parses the current users to json and writes 
 func getUsers(w http.ResponseWriter, r *http.Request){
 	js, err := json.Marshal(users[0:index+1])
 	if err != nil {
@@ -39,6 +41,7 @@ func getUsers(w http.ResponseWriter, r *http.Request){
 	fmt.Fprint(w, string(js))
 }
 
+// Routs each request of 'users' to its method
 func usersRouter(w http.ResponseWriter, r *http.Request){
 	switch r.Method {
 	case http.MethodGet:
@@ -55,7 +58,10 @@ func usersRouter(w http.ResponseWriter, r *http.Request){
 }
 
 func main() {
-  users[0].Username = "sella"
+	// Default user
+	users[0].Username = "sella"
+	
+	// Http server conf
   http.HandleFunc("/users", usersRouter)
   if err := http.ListenAndServe(":8080", nil); err != nil {
     panic(err)
