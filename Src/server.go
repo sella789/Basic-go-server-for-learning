@@ -1,12 +1,13 @@
 package main
+
 import (
-  "net/http"
-  "encoding/json"
-  "fmt"
+	"encoding/json"
+	"fmt"
+	"net/http"
 )
 
-var index int = 0;
-var users [1000]*user;
+var index int
+var users [1000]*user
 var userChats []UserChat
 
 // The post method of users
@@ -17,55 +18,53 @@ func addUser(w http.ResponseWriter, r *http.Request) {
 	//Parse json request body and use it to set fields on user
 	//Note that user is passed as a pointer variable so that it's fields can be modified
 	err := json.NewDecoder(r.Body).Decode(&user)
-	if err != nil{
+	if err != nil {
 		panic(err)
 	}
 	u := NewUser(user.Username)
 
-  users[index] = u
-  index++
+	users[index] = u
+	index++
 }
 
-
-
-func updateUser(w http.ResponseWriter, r *http.Request){
-		user := user{} //initialize empty user
+func updateUser(w http.ResponseWriter, r *http.Request) {
+	user := user{} //initialize empty user
 
 	//Parse json request body and use it to set fields on user
 	err := json.NewDecoder(r.Body).Decode(&user)
-	if err != nil{
+	if err != nil {
 		panic(err)
 	}
 
-	u := NewUserWithId(user.Id, user.Username)
+	u := NewUserWithID(user.ID, user.Username)
 
-	for i:=0; i < 1000; i++ {
-		if(u.Id == users[i].Id){
+	for i := 0; i < 1000; i++ {
+		if u.ID == users[i].ID {
 			users[i] = u
 		}
 	}
 }
 
 // Users get request function
-// Parses the current users to json and writes 
-func getUsers(w http.ResponseWriter, r *http.Request){
-	js, err := json.Marshal(users[0:index+1])
+// Parses the current users to json and writes
+func getUsers(w http.ResponseWriter, r *http.Request) {
+	js, err := json.Marshal(users[0 : index+1])
 	if err != nil {
-	  http.Error(w, err.Error(), http.StatusInternalServerError)
-	  return
+		http.Error(w, err.Error(), http.StatusInternalServerError) //! Parsing error
+		return
 	}
-  
+
 	w.Header().Set("Content-Type", "application/json")
 	fmt.Fprint(w, string(js))
 }
 
 // Routs each request of 'users' to its method
-func usersRouter(w http.ResponseWriter, r *http.Request){
+func usersRouter(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		getUsers(w, r)
 	case http.MethodPost:
-		addUser(w,r)
+		addUser(w, r)
 	case http.MethodPut:
 		// Update an existing record.
 	case http.MethodDelete:
@@ -75,13 +74,13 @@ func usersRouter(w http.ResponseWriter, r *http.Request){
 	}
 }
 
-func getMessages(w http.ResponseWriter, r *http.Request){
+func getMessages(w http.ResponseWriter, r *http.Request) {
 	js, err := json.Marshal(userChats)
 	if err != nil {
-	  http.Error(w, err.Error(), http.StatusInternalServerError)
-	  return
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
-  
+
 	w.Header().Set("Content-Type", "application/json")
 	fmt.Fprint(w, string(js))
 }
@@ -89,7 +88,7 @@ func getMessages(w http.ResponseWriter, r *http.Request){
 func messagesRouter(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		getMessages(w,r)
+		getMessages(w, r)
 	case http.MethodPost:
 
 	case http.MethodPut:
@@ -104,18 +103,18 @@ func messagesRouter(w http.ResponseWriter, r *http.Request) {
 func main() {
 	// Default user
 	var myMsg []message
-	myMsg = append(myMsg, (message{SenderID: 1, ReceiverID:2,Content:"hello"}))
+	myMsg = append(myMsg, (message{SenderID: 1, ReceiverID: 2, Content: "hello"}))
 	users[0] = NewUser("sella")
 	userChats = append(userChats, UserChat{
-		UserID : 1,
-		SecondUserID : 2,
-		Messages : myMsg,
+		UserID:       1,
+		SecondUserID: 2,
+		Messages:     myMsg,
 	})
 
 	// Http server conf
 	http.HandleFunc("/users", usersRouter)
-	http.HandleFunc("/messages" , messagesRouter)
-  if err := http.ListenAndServe(":8080", nil); err != nil {
-    panic(err)
-  }
+	http.HandleFunc("/messages", messagesRouter)
+	if err := http.ListenAndServe(":8080", nil); err != nil {
+		panic(err)
+	}
 }

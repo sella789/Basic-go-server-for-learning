@@ -1,26 +1,39 @@
 package main
 
 // The id counter
-var currentId int = 0
+var currentID int
 
 // The user struct
-type user struct{
-	Id int
+type user struct {
+	ID       int
 	Username string
 	passwrod string
 }
 
-func NewUser(username string) *user{
+/**
+* NewUser
+* * The function creates a new user
+* * With a generated id
+* @param username the user's username
+**/
+func NewUser(username string) *user {
 	u := new(user)
-	u.Id = currentId
+	u.ID = currentID
 	u.Username = username
 
 	return u
 }
 
-func NewUserWithId(id int,username string) *user{
+/**
+* NewUserWithId
+* * The function creates a new user
+* * With a given id
+* @param username the user's username
+* @param id the users id
+**/
+func NewUserWithID(id int, username string) *user {
 	u := new(user)
-	u.Id = id
+	u.ID = id
 	u.Username = username
 
 	return u
