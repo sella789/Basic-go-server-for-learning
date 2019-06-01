@@ -7,6 +7,7 @@ import (
 
 var index int = 0;
 var users [1000]*user;
+var userChats []UserChat
 
 // The post method of users
 // Adds the user to the users list
@@ -24,6 +25,8 @@ func addUser(w http.ResponseWriter, r *http.Request) {
   users[index] = u
   index++
 }
+
+
 
 func updateUser(w http.ResponseWriter, r *http.Request){
 		user := user{} //initialize empty user
@@ -72,12 +75,46 @@ func usersRouter(w http.ResponseWriter, r *http.Request){
 	}
 }
 
+func getMessages(w http.ResponseWriter, r *http.Request){
+	js, err := json.Marshal(userChats)
+	if err != nil {
+	  http.Error(w, err.Error(), http.StatusInternalServerError)
+	  return
+	}
+  
+	w.Header().Set("Content-Type", "application/json")
+	fmt.Fprint(w, string(js))
+}
+
+func messagesRouter(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+		getMessages(w,r)
+	case http.MethodPost:
+
+	case http.MethodPut:
+		// Update an existing record.
+	case http.MethodDelete:
+		// Remove the record.
+	default:
+		// Give an error message.
+	}
+}
+
 func main() {
 	// Default user
+	var myMsg []message
+	myMsg = append(myMsg, (message{SenderID: 1, ReceiverID:2,Content:"hello"}))
 	users[0] = NewUser("sella")
-	
+	userChats = append(userChats, UserChat{
+		UserID : 1,
+		SecondUserID : 2,
+		Messages : myMsg,
+	})
+
 	// Http server conf
-  http.HandleFunc("/users", usersRouter)
+	http.HandleFunc("/users", usersRouter)
+	http.HandleFunc("/messages" , messagesRouter)
   if err := http.ListenAndServe(":8080", nil); err != nil {
     panic(err)
   }
