@@ -7,7 +7,8 @@ var currentId int = 0
 type user struct{
 	Id int
 	Username string
-	passwrod string
+	password string
+	email string
 }
 
 func NewUser(username string) *user{
