@@ -7,7 +7,7 @@ import (
 )
 
 var index int
-var users [1000]*user
+var users []*user
 var userChats []UserChat
 
 // The post method of users
@@ -23,10 +23,16 @@ func addUser(w http.ResponseWriter, r *http.Request) {
 	}
 	u := NewUser(user.Username)
 
-	users[index] = u
+	users = append(users, u)
 	index++
 }
 
+/**
+ * * updateUser function
+ * * the function updates an existing user
+ * @param w the response writer a basic param in http requests
+ * @param r the request a basic param in http requests
+ */
 func updateUser(w http.ResponseWriter, r *http.Request) {
 	user := user{} //initialize empty user
 
@@ -38,7 +44,7 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 
 	u := NewUserWithID(user.ID, user.Username)
 
-	for i := 0; i < 1000; i++ {
+	for i := range users {
 		if u.ID == users[i].ID {
 			users[i] = u
 		}
@@ -48,7 +54,7 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 // Users get request function
 // Parses the current users to json and writes
 func getUsers(w http.ResponseWriter, r *http.Request) {
-	js, err := json.Marshal(users[0 : index+1])
+	js, err := json.Marshal(users)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError) //! Parsing error
 		return
@@ -59,7 +65,7 @@ func getUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 // Routs each request of 'users' to its method
-func usersRouter(w http.ResponseWriter, r *http.Request) {
+func UsersRouter(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		getUsers(w, r)
@@ -85,6 +91,13 @@ func getMessages(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, string(js))
 }
 
+/**
+ * * messageRouter function
+ * * the function routes the request according
+ * * to the method in the request
+ * @param w the response writer a basic param in http requests
+ * @param r the request a basic param in http requests
+ */
 func messagesRouter(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
@@ -100,11 +113,16 @@ func messagesRouter(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+/**
+ * * The main function of the program
+ * * The function inits the server
+ */
 func main() {
-	// Default user
+
+	// Test data for get request
 	var myMsg []message
 	myMsg = append(myMsg, (message{SenderID: 1, ReceiverID: 2, Content: "hello"}))
-	users[0] = NewUser("sella")
+	users = append(users, NewUser("stella"))
 	userChats = append(userChats, UserChat{
 		UserID:       1,
 		SecondUserID: 2,
@@ -112,7 +130,7 @@ func main() {
 	})
 
 	// Http server conf
-	http.HandleFunc("/users", usersRouter)
+	http.HandleFunc("/users", UsersRouter)
 	http.HandleFunc("/messages", messagesRouter)
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		panic(err)

@@ -8,7 +8,7 @@ type user struct {
 	ID       int
 	Username string
 	password string
-	email string
+	email    string
 }
 
 /**
