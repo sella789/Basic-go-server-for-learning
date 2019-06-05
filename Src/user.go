@@ -7,8 +7,8 @@ var currentID int
 type user struct {
 	ID       int
 	Username string
-	password string
-	email    string
+	Password string
+	Email    string
 }
 
 /**

@@ -113,6 +113,10 @@ func messagesRouter(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func LoadFile(w http.ResponseWriter, r *http.Request) {
+
+}
+
 /**
  * * The main function of the program
  * * The function inits the server
@@ -129,7 +133,10 @@ func main() {
 		Messages:     myMsg,
 	})
 
+	fs := http.FileServer(http.Dir("static"))
+	http.Handle("/", fs)
 	// Http server conf
+
 	http.HandleFunc("/users", UsersRouter)
 	http.HandleFunc("/messages", messagesRouter)
 	if err := http.ListenAndServe(":8080", nil); err != nil {
